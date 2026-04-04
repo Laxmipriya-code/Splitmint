@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: splitmint
+      POSTGRES_USER: splitmint
+      POSTGRES_PASSWORD: splitmint
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  backend:
+    build:
+      context: ./backend
+    depends_on:
+      - db
+    environment:
+      SPLITMINT_DATABASE_URL: postgresql+psycopg://splitmint:splitmint@db:5432/splitmint
+      SPLITMINT_FRONTEND_ORIGIN: http://localhost:8080
+      SPLITMINT_JWT_SECRET_KEY: replace-with-a-long-random-secret-at-least-32-bytes
+      SPLITMINT_AI_ENABLED: "false"
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: http://localhost:8000/api/v1
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+
+volumes:
+  postgres_data:

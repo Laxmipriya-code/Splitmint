@@ -1,0 +1,1 @@
+"""SplitMint backend package."""

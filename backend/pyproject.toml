@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "splitmint-backend"
+version = "0.1.0"
+description = "SplitMint backend service"
+requires-python = ">=3.12"
+dependencies = [
+  "alembic>=1.16.0",
+  "email-validator>=2.2.0",
+  "fastapi>=0.116.0",
+  "httpx>=0.28.0",
+  "langchain>=0.3.26",
+  "langchain-openai>=0.3.27",
+  "pydantic-settings>=2.10.0",
+  "pyjwt>=2.10.0",
+  "sqlalchemy>=2.0.41",
+  "uvicorn[standard]>=0.35.0",
+  "psycopg[binary]>=3.2.9",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3.0",
+  "pytest-cov>=6.2.0",
+  "ruff>=0.12.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["B008", "E501"]
+
+[tool.setuptools.packages.find]
+include = ["app*"]

@@ -1,0 +1,20 @@
+Metadata-Version: 2.4
+Name: splitmint-backend
+Version: 0.1.0
+Summary: SplitMint backend service
+Requires-Python: >=3.12
+Requires-Dist: alembic>=1.16.0
+Requires-Dist: email-validator>=2.2.0
+Requires-Dist: fastapi>=0.116.0
+Requires-Dist: httpx>=0.28.0
+Requires-Dist: langchain>=0.3.26
+Requires-Dist: langchain-openai>=0.3.27
+Requires-Dist: pydantic-settings>=2.10.0
+Requires-Dist: pyjwt>=2.10.0
+Requires-Dist: sqlalchemy>=2.0.41
+Requires-Dist: uvicorn[standard]>=0.35.0
+Requires-Dist: psycopg[binary]>=3.2.9
+Provides-Extra: dev
+Requires-Dist: pytest>=8.3.0; extra == "dev"
+Requires-Dist: pytest-cov>=6.2.0; extra == "dev"
+Requires-Dist: ruff>=0.12.0; extra == "dev"
