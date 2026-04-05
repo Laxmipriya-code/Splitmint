@@ -31,12 +31,14 @@ projects:
         sync: false
       - key: SPLITMINT_FRONTEND_ORIGIN
         sync: false
+      # Render cannot reach Supabase direct DB URLs that require IPv6.
+      # Use the Supavisor session pooler URL here, usually on *.pooler.supabase.com:5432.
       - key: SPLITMINT_DATABASE_URL
         sync: false
       - key: SPLITMINT_MIGRATION_DATABASE_URL
         sync: false
       - key: SPLITMINT_DB_DISABLE_PREPARED_STATEMENTS
-        value: "false"
+        sync: false
       region: oregon
       dockerContext: .
       dockerfilePath: ./Dockerfile

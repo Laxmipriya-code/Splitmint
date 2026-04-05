@@ -78,10 +78,11 @@ Update `backend/.env` and set all required runtime settings:
 Supabase setup notes:
 
 - Runtime URL can be either direct DB host (`db.<project-ref>.supabase.co:5432`) or pooler host (`*.pooler.supabase.com:6543`).
+- Supabase direct DB hosts require IPv6. If your runtime is IPv4-only, use the Supavisor session pooler URL on `*.pooler.supabase.com:5432` instead.
 - This backend auto-adds `sslmode=require` for Supabase hosts when it is missing.
 - For Supabase transaction pooler URLs (port `6543`), the backend auto-disables psycopg prepared statements for runtime connections.
 - You can override that behavior with `SPLITMINT_DB_DISABLE_PREPARED_STATEMENTS=true|false`.
-- If runtime uses a pooler URL, set `SPLITMINT_MIGRATION_DATABASE_URL` to the direct DB URL so Alembic and startup migration checks use a stable migration target.
+- If runtime uses the transaction pooler (`6543`), set `SPLITMINT_MIGRATION_DATABASE_URL` to a stable non-transaction target. Use the direct DB URL when IPv6 is available, otherwise use the Supavisor session pooler on `5432`.
 
 Run migrations and start the API:
 

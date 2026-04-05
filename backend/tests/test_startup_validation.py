@@ -53,3 +53,18 @@ def test_summarize_database_error_prepared_statement_conflict() -> None:
         "Prepared statements are incompatible with this pooler. Use a direct/session connection, "
         "or disable prepared statements for runtime connections."
     )
+
+
+def test_summarize_database_error_supabase_direct_ipv6_unreachable() -> None:
+    error = _operational_error(
+        'connection to server at "2406:da12:b78:de13:254b:eae:5c3c:1f83", port 5432 failed: '
+        "Network is unreachable"
+    )
+    assert _summarize_database_error(
+        error,
+        "postgresql+psycopg://postgres:secret@db.abcd1234.supabase.co:5432/postgres",
+    ) == (
+        "This Supabase direct connection uses IPv6 by default, but the current runtime "
+        "cannot reach IPv6. On Render, switch to the Supavisor session pooler URL "
+        "(port 5432), or enable Supabase's IPv4 add-on."
+    )

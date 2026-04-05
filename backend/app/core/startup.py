@@ -53,7 +53,7 @@ def _validate_database_connectivity(database_url: str) -> None:
             connection.execute(text("SELECT 1"))
     except SQLAlchemyError as exc:
         target = _format_database_target(database_url)
-        detail = _summarize_database_error(exc)
+        detail = _summarize_database_error(exc, database_url)
         raise RuntimeError(
             f"Database connectivity failed for {target}. {detail} Verify SPLITMINT_DATABASE_URL "
             "points to your running PostgreSQL instance."
@@ -98,7 +98,7 @@ def _format_database_target(database_url: str) -> str:
     return f"{host}:{port}/{database}"
 
 
-def _summarize_database_error(exc: SQLAlchemyError) -> str:
+def _summarize_database_error(exc: SQLAlchemyError, database_url: str | None = None) -> str:
     raw = str(getattr(exc, "orig", exc)).replace("\n", " ").strip()
     lowered = raw.lower()
     if "password authentication failed" in lowered:
@@ -110,6 +110,14 @@ def _summarize_database_error(exc: SQLAlchemyError) -> str:
             "Prepared statements are incompatible with this pooler. Use a direct/session connection, "
             "or disable prepared statements for runtime connections."
         )
+    if "network is unreachable" in lowered:
+        if database_url and _is_supabase_direct_connection(database_url):
+            return (
+                "This Supabase direct connection uses IPv6 by default, but the current runtime "
+                "cannot reach IPv6. On Render, switch to the Supavisor session pooler URL "
+                "(port 5432), or enable Supabase's IPv4 add-on."
+            )
+        return "Network was unreachable; check outbound network support, DNS, and routing."
     if "connection refused" in lowered or "actively refused" in lowered:
         return "Connection was refused; check host, port, and server status."
     if "could not translate host name" in lowered or "name or service not known" in lowered:
@@ -117,3 +125,9 @@ def _summarize_database_error(exc: SQLAlchemyError) -> str:
     if raw:
         return f"Driver detail: {raw}"
     return "No additional driver detail was provided."
+
+
+def _is_supabase_direct_connection(database_url: str) -> bool:
+    parsed = make_url(database_url)
+    host = (parsed.host or "").lower()
+    return host.endswith(".supabase.co") and (parsed.port or 5432) == 5432
