@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Literal
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
-from pydantic import Field, ValidationError, computed_field
+from pydantic import Field, ValidationError, computed_field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BACKEND_DIR = Path(__file__).resolve().parents[2]
@@ -46,6 +46,14 @@ class Settings(BaseSettings):
     openai_model: str = "gpt-5-mini"
 
     log_level: str = "INFO"
+
+    @field_validator("db_disable_prepared_statements", mode="before")
+    @classmethod
+    def _normalize_optional_bool(cls, value: object) -> object:
+        # Treat empty env values as "unset" so deployment platforms can keep this optional.
+        if isinstance(value, str) and value.strip() == "":
+            return None
+        return value
 
     @computed_field
     @property

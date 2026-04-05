@@ -36,7 +36,7 @@ projects:
       - key: SPLITMINT_MIGRATION_DATABASE_URL
         sync: false
       - key: SPLITMINT_DB_DISABLE_PREPARED_STATEMENTS
-        sync: false
+        value: "false"
       region: oregon
       dockerContext: .
       dockerfilePath: ./Dockerfile
