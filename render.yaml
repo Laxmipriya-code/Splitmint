@@ -1,0 +1,39 @@
+# Exported from Render on 2026-04-05T05:16:21Z
+version: "1"
+projects:
+- name: My project
+  environments:
+  - name: Production
+    services:
+    - type: web
+      name: Splitmint
+      runtime: docker
+      repo: https://github.com/Laxmipriya-code/Splitmint
+      plan: free
+      envVars:
+      - key: SPLITMINT_AI_ENABLED
+        sync: false
+      - key: SPLITMINT_DEBUG
+        sync: false
+      - key: SPLITMINT_ENVIRONMENT
+        sync: false
+      - key: SPLITMINT_LOG_LEVEL
+        sync: false
+      - key: SPLITMINT_OPENAI_MODEL
+        sync: false
+      - key: SPLITMINT_OPENAI_API_KEY
+        sync: false
+      - key: SPLITMINT_REFRESH_TOKEN_EXPIRE_DAYS
+        sync: false
+      - key: SPLITMINT_ACCESS_TOKEN_EXPIRE_MINUTES
+        sync: false
+      - key: SPLITMINT_JWT_SECRET_KEY
+        sync: false
+      - key: SPLITMINT_FRONTEND_ORIGIN
+        sync: false
+      - key: SPLITMINT_DATABASE_URL
+        sync: false
+      region: oregon
+      dockerContext: .
+      dockerfilePath: ./Dockerfile
+      autoDeployTrigger: commit
