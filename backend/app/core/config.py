@@ -47,6 +47,14 @@ class Settings(BaseSettings):
 
     log_level: str = "INFO"
 
+    @field_validator("database_url", "migration_database_url", "test_database_url", mode="before")
+    @classmethod
+    def _normalize_optional_url(cls, value: object) -> object:
+        if isinstance(value, str):
+            stripped = value.strip()
+            return stripped or None
+        return value
+
     @field_validator("db_disable_prepared_statements", mode="before")
     @classmethod
     def _normalize_optional_bool(cls, value: object) -> object:
@@ -117,6 +125,7 @@ class Settings(BaseSettings):
 
     @staticmethod
     def _normalize_postgres_url(url: str) -> str:
+        url = url.strip()
         parsed = urlsplit(url)
         if not parsed.scheme.startswith("postgres"):
             return url
@@ -125,10 +134,21 @@ class Settings(BaseSettings):
         if not (host.endswith(".supabase.co") or host.endswith(".supabase.com")):
             return url
 
-        query_pairs = parse_qsl(parsed.query, keep_blank_values=True)
+        query_pairs = [
+            (key.strip(), value.strip())
+            for key, value in parse_qsl(parsed.query, keep_blank_values=True)
+        ]
         query = dict(query_pairs)
-        if "sslmode" in query:
-            return url
+        if query.get("sslmode"):
+            return urlunsplit(
+                (
+                    parsed.scheme,
+                    parsed.netloc,
+                    parsed.path,
+                    urlencode(query, doseq=True),
+                    parsed.fragment,
+                )
+            )
 
         query["sslmode"] = "require"
         return urlunsplit(

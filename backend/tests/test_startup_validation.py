@@ -47,6 +47,14 @@ def test_summarize_database_error_ssl_required() -> None:
     )
 
 
+def test_summarize_database_error_invalid_sslmode() -> None:
+    error = _operational_error('connection is bad: invalid sslmode value: "require "')
+    assert _summarize_database_error(error) == (
+        "The PostgreSQL URL has an invalid `sslmode` value. Remove extra spaces and use "
+        "`sslmode=require`."
+    )
+
+
 def test_summarize_database_error_prepared_statement_conflict() -> None:
     error = _operational_error('prepared statement "_pg3_0" does not exist')
     assert _summarize_database_error(error) == (

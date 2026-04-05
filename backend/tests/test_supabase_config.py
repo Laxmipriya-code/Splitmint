@@ -71,6 +71,30 @@ def test_supabase_url_preserves_existing_sslmode() -> None:
     assert "sslmode=verify-full" in settings.effective_database_url
 
 
+def test_supabase_url_trims_sslmode_whitespace() -> None:
+    settings = Settings(
+        database_url=(
+            "postgresql+psycopg://postgres.abcd1234:secret@aws-0-ap-south-1.pooler.supabase.com:"
+            "5432/postgres?sslmode=require "
+        ),
+        db_disable_prepared_statements=None,
+        jwt_secret_key=SECRET,
+    )
+    assert "sslmode=require" in settings.effective_database_url
+    assert "sslmode=require+" not in settings.effective_database_url
+
+
+def test_supabase_url_trims_outer_whitespace() -> None:
+    settings = Settings(
+        database_url=(
+            "  postgresql+psycopg://postgres:secret@db.abcd1234.supabase.co:5432/postgres  "
+        ),
+        db_disable_prepared_statements=None,
+        jwt_secret_key=SECRET,
+    )
+    assert settings.effective_database_url.startswith("postgresql+psycopg://postgres:secret@")
+
+
 def test_migration_url_can_differ_from_runtime_url() -> None:
     settings = Settings(
         database_url=(

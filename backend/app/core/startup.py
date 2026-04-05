@@ -105,6 +105,11 @@ def _summarize_database_error(exc: SQLAlchemyError, database_url: str | None = N
         return "Authentication failed for the configured database user."
     if "no pg_hba.conf entry" in lowered and "no encryption" in lowered:
         return "Server requires SSL. Add `?sslmode=require` to the PostgreSQL URL."
+    if "invalid sslmode value" in lowered:
+        return (
+            "The PostgreSQL URL has an invalid `sslmode` value. Remove extra spaces and use "
+            "`sslmode=require`."
+        )
     if "prepared statement" in lowered and "does not exist" in lowered:
         return (
             "Prepared statements are incompatible with this pooler. Use a direct/session connection, "
